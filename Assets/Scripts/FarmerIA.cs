@@ -7,10 +7,12 @@ public class FarmerIA : MonoBehaviour
 {
 
     public float gatheringDistance = 1f;
-    public float grindingTime = 3f;
+    public float grindingTime = 1f;
+    public float farmingTime = 1f;
     public Transform field;
     public Transform Mill;
 
+    private Growth growthScript;
     private NavMeshAgent navmesh;
     private bool farming, grinding;
     private Transform currentDest;
@@ -20,6 +22,8 @@ public class FarmerIA : MonoBehaviour
         navmesh = GetComponent<NavMeshAgent>();
         farming = true;
         grinding = false;
+
+        growthScript = field.gameObject.GetComponent<Growth>();
     }
 
     void Update()
@@ -28,20 +32,18 @@ public class FarmerIA : MonoBehaviour
         {
             if(!currentDest)
             {
-                currentDest = GetNearestPlantation();
-                if(currentDest is null)
-                {
-                    return;
-                } else {
-                    navmesh.SetDestination(currentDest.position);
-                }
+                SetTarget();
+            }
+            
+            else if(AtDestination())
+            {
+                growthScript.Gather(currentDest.gameObject);
+                StartCoroutine(FarmingCoroutine());
             }
 
-            if(AtDestination())
+            else
             {
-                Destroy(currentDest.gameObject);
-                farming = false;
-                grinding = true;
+                SetTarget();
             }
         }
         
@@ -49,21 +51,40 @@ public class FarmerIA : MonoBehaviour
         {
             navmesh.SetDestination(Mill.position);
 
-            if(AtDestination())
+            if(AtDestination(3f))
             {
                 StartCoroutine(GrindingCoroutine());
-                grinding = false;
             }
         }
-
-        
     }
 
     IEnumerator GrindingCoroutine()
     {
+        grinding = false;
+        
         yield return new WaitForSeconds(grindingTime);
 
         farming = true;
+    }
+
+    IEnumerator FarmingCoroutine()
+    {   
+        farming = false;
+
+        yield return new WaitForSeconds(farmingTime);
+
+        grinding = true;
+    }
+
+    private void SetTarget()
+    {
+        currentDest = GetNearestPlantation();
+        if(currentDest is null)
+        {
+            return;
+        } else {
+            navmesh.SetDestination(currentDest.position);
+        }
     }
 
     bool AtDestination()
