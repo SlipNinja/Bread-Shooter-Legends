@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8651618281727882609}
   - component: {fileID: 8651618281727882608}
   - component: {fileID: 8651618281727882615}
+  - component: {fileID: 8654809386669612526}
   m_Layer: 0
   m_Name: Farmer
   m_TagString: Untagged
@@ -110,7 +111,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 7
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -119,9 +120,24 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 1
-  m_BaseOffset: 0
+  m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &8654809386669612526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8651618281727882614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bf2ccc33b7772a49b1e909b5fcc724e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gatheringDistance: 1
+  field: {fileID: 0}
+  Mill: {fileID: 0}
 --- !u!1001 &5381697532827900196
 PrefabInstance:
   m_ObjectHideFlags: 0
