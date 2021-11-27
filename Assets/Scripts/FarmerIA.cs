@@ -11,8 +11,9 @@ public class FarmerIA : MonoBehaviour
 
     private static GameObject Mills;
     private float gatheringDistance = 2f;
-    private float grindingTime = 6f;
-    private float farmingTime = 3f;
+    private float grindingDistance = 2f;
+    private float grindingTime = 4f;
+    private float farmingTime = 2f;
     private Growth growthScript;
     private NavMeshAgent navmesh;
     private bool farming, grinding;
@@ -176,7 +177,22 @@ public class FarmerIA : MonoBehaviour
     bool AtDestination()
     {
         float dist = Vector3.Distance(transform.position, navmesh.destination);
-        return (dist <= gatheringDistance);
+
+        if(grinding)
+        {
+            return (dist <= grindingDistance);
+        }
+
+        else if(farming)
+        {
+            return (dist <= gatheringDistance);
+        }
+
+        else
+        {
+            Debug.Log("Has target but no state");
+            return false;
+        }
     }
 
     Transform GetNearestPlantation()
