@@ -76,8 +76,6 @@ public class Growth : MonoBehaviour
         {
             return null;
         }
-
-        //Debug.Log(freeSpawns.Count());
         
         int spawnIndex = Random.Range(0, freeSpawns.Count()-1);
         

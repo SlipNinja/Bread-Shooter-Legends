@@ -28,7 +28,6 @@ public class FarmerIA : MonoBehaviour
 
         if(millDeposits is null)
         {
-            Debug.Log("COUCOU");
             //Gathering deposit data
             millDeposits = new Dictionary<Transform, bool>();
             foreach (Transform mill in Mills.transform)
@@ -81,8 +80,6 @@ public class FarmerIA : MonoBehaviour
         
         else if(grinding)
         {
-            //navmesh.SetDestination(Mill.position);
-
             if(!currentDest)
             {
                 SetGrindingTarget();
@@ -115,9 +112,7 @@ public class FarmerIA : MonoBehaviour
     {   
         farming = false;
 
-        Debug.Log(navmesh.avoidancePriority + " Started Coroutine at timestamp : " + Time.time);
         yield return new WaitForSeconds(farmingTime);
-        Debug.Log(navmesh.avoidancePriority + " Finished Coroutine at timestamp : " + Time.time);
 
         grinding = true;
     }
@@ -192,8 +187,6 @@ public class FarmerIA : MonoBehaviour
             Debug.Log("No free deposit to grind");
             return null;
         }
-
-        Debug.Log(freeDeposits.Count);
 
         Transform nearest = null;
         float mindist = 1000f;
