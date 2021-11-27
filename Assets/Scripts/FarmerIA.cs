@@ -1,15 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.AI;
 using System.Linq;
 
 public class FarmerIA : MonoBehaviour
 {
     public Transform field;
-    public GameObject Mills;
 
-    private float gatheringDistance = 1f;
+    private static GameObject Mills;
+    private float gatheringDistance = 2f;
     private float grindingTime = 6f;
     private float farmingTime = 3f;
     private Growth growthScript;
@@ -17,9 +18,19 @@ public class FarmerIA : MonoBehaviour
     private bool farming, grinding;
     private Transform currentDest;
     private static Dictionary<Transform, bool> millDeposits = null;
+    private Transform lifebar;
+    private Image lifeImg;
+    private float currentHP;
+    private float maxHP = 100f;
 
     void Start()
     {
+        currentHP = maxHP;
+        lifebar = transform.Find("LifeBar");
+        lifeImg = lifebar.Find("front").GetComponent<Image>();
+
+        Mills = GameObject.FindWithTag("mills");
+
         navmesh = GetComponent<NavMeshAgent>();
         farming = true;
         grinding = false;
@@ -28,30 +39,37 @@ public class FarmerIA : MonoBehaviour
 
         if(millDeposits is null)
         {
-            //Gathering deposit data
-            millDeposits = new Dictionary<Transform, bool>();
-            foreach (Transform mill in Mills.transform)
+            InitDeposits();
+        }
+    }
+
+    public static void InitDeposits()
+    {
+        //Gathering deposit data
+        millDeposits = new Dictionary<Transform, bool>();
+        foreach (Transform mill in Mills.transform)
+        {
+            if(!mill.name.Contains("Mill"))
             {
-                if(!mill.name.Contains("Mill"))
+                continue;
+            }
+
+            foreach (Transform deposit in mill.transform)
+            {
+                if(!deposit.name.Contains("deposit"))
                 {
                     continue;
                 }
 
-                foreach (Transform deposit in mill.transform)
-                {
-                    if(!deposit.name.Contains("deposit"))
-                    {
-                        continue;
-                    }
-
-                    millDeposits.Add(deposit, true);
-                }
+                millDeposits.Add(deposit, true);
             }
         }
     }
 
     void Update()
     {
+        UpdateLifebar();
+
         if(farming)
         {
             if(!currentDest)
@@ -97,11 +115,27 @@ public class FarmerIA : MonoBehaviour
         }
     }
 
+    private void UpdateLifebar()
+    {
+        lifebar.rotation = Camera.main.transform.rotation;
+        lifeImg.fillAmount = currentHP/maxHP;
+    }
+
+    public void GetHit(float damages)
+    {
+        currentHP -= damages;
+        if (currentHP <= 0)
+        {
+            currentHP = 0;
+            Destroy(transform.gameObject);
+        }
+    }
+
     IEnumerator GrindingCoroutine()
     {
         grinding = false;
         millDeposits[currentDest] = false;
-        
+
         yield return new WaitForSeconds(grindingTime);
 
         millDeposits[currentDest] = true;
@@ -188,15 +222,20 @@ public class FarmerIA : MonoBehaviour
             return null;
         }
 
+        //Debug.Log(freeDeposits.Count);
+
         Transform nearest = null;
         float mindist = 1000f;
         foreach (KeyValuePair<Transform, bool> deposit in freeDeposits)
         {
-            float dist = Vector3.Distance(transform.position, deposit.Key.position);
-            if(dist < mindist)
+            if(deposit.Key)
             {
-                nearest = deposit.Key;
-                mindist = dist;
+                float dist = Vector3.Distance(transform.position, deposit.Key.position);
+                if(dist < mindist)
+                {
+                    nearest = deposit.Key;
+                    mindist = dist;
+                }
             }
         }
 
