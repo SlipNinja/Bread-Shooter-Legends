@@ -50,8 +50,9 @@ public class EnnemyIA : MonoBehaviour
             Transform closestMill = ClosestMill();
             if(closestMill)
             {
-                target = closestMill;
-                navmesh.SetDestination(closestMill.position);
+                Transform attackPoint = closestMill.Find("attackPoint");
+                target = attackPoint;
+                navmesh.SetDestination(attackPoint.position);
             }
         }
 
@@ -92,7 +93,7 @@ public class EnnemyIA : MonoBehaviour
             return;
         }
 
-        Building building = target.GetComponent<Building>();
+        Building building = target.parent.GetComponent<Building>();
         if(building)
         {
             building.GetHit(attackDamage);

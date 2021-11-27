@@ -8,7 +8,7 @@ public class Building : MonoBehaviour
     private Transform lifebar;
     private Image lifeImg;
     private float currentHP;
-    private float maxHP = 100f;
+    private float maxHP = 200f;
     
     void Start()
     {

@@ -49,7 +49,7 @@ public class Growth : MonoBehaviour
         }
     }
  
- void Update () {
+    void Update () {
     
     if (Time.time > nextSpawn ) {
         nextSpawn = Time.time + 1/spawnRate;// Range around spawnrate mayb
