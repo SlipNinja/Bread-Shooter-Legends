@@ -52,7 +52,7 @@ public class Growth : MonoBehaviour
  void Update () {
     
     if (Time.time > nextSpawn ) {
-        nextSpawn = Time.time + 1/spawnRate;
+        nextSpawn = Time.time + 1/spawnRate;// Range around spawnrate mayb
 
         GameObject spawn = GetRandomFreeSpawn();
 
@@ -84,10 +84,27 @@ public class Growth : MonoBehaviour
         return freeSpawns.ElementAt(spawnIndex).Key;
     }
 
-    public void Gather(GameObject weat)
+    public bool Gather(GameObject weat, float deleteOffset)
     {
-        KeyValuePair<GameObject, GameObject> newFreeSpawn = spawnPoints.First(spawn => spawn.Value == weat);
-        spawnPoints[newFreeSpawn.Key] = null;
+        List<KeyValuePair<GameObject, GameObject>> newFreeSpawns = spawnPoints.Where(spawn => spawn.Value == weat).ToList();
+
+        if(newFreeSpawns.Count <= 0)
+        {
+            Debug.Log("Already gathered");
+            return false;
+        }
+
         Destroy(weat);
+        StartCoroutine(CleaningCoroutine(newFreeSpawns.ElementAt(0).Key, deleteOffset));
+
+        return true;
+    }
+
+    IEnumerator CleaningCoroutine(GameObject spawn, float deleteOffset)
+    {
+        yield return new WaitForSeconds(deleteOffset);
+
+        spawnPoints[spawn] = null;
+        
     }
 }

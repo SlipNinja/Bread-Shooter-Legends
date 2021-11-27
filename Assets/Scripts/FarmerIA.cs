@@ -2,20 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Linq;
 
 public class FarmerIA : MonoBehaviour
 {
-
-    public float gatheringDistance = 1f;
-    public float grindingTime = 1f;
-    public float farmingTime = 1f;
     public Transform field;
-    public Transform Mill;
+    public GameObject Mills;
 
+    private float gatheringDistance = 1f;
+    private float grindingTime = 6f;
+    private float farmingTime = 3f;
     private Growth growthScript;
     private NavMeshAgent navmesh;
     private bool farming, grinding;
     private Transform currentDest;
+    private static Dictionary<Transform, bool> millDeposits = null;
 
     void Start()
     {
@@ -24,6 +25,30 @@ public class FarmerIA : MonoBehaviour
         grinding = false;
 
         growthScript = field.gameObject.GetComponent<Growth>();
+
+        if(millDeposits is null)
+        {
+            Debug.Log("COUCOU");
+            //Gathering deposit data
+            millDeposits = new Dictionary<Transform, bool>();
+            foreach (Transform mill in Mills.transform)
+            {
+                if(!mill.name.Contains("Mill"))
+                {
+                    continue;
+                }
+
+                foreach (Transform deposit in mill.transform)
+                {
+                    if(!deposit.name.Contains("deposit"))
+                    {
+                        continue;
+                    }
+
+                    millDeposits.Add(deposit, true);
+                }
+            }
+        }
     }
 
     void Update()
@@ -32,28 +57,45 @@ public class FarmerIA : MonoBehaviour
         {
             if(!currentDest)
             {
-                SetTarget();
+                SetFarmingTarget();
             }
             
             else if(AtDestination())
             {
-                growthScript.Gather(currentDest.gameObject);
-                StartCoroutine(FarmingCoroutine());
+                if(growthScript.Gather(currentDest.gameObject, farmingTime))
+                {
+                    StartCoroutine(FarmingCoroutine());
+                }
+
+                else
+                {
+                    SetFarmingTarget();
+                }
             }
 
             else
             {
-                SetTarget();
+                SetFarmingTarget();
             }
         }
         
         else if(grinding)
         {
-            navmesh.SetDestination(Mill.position);
+            //navmesh.SetDestination(Mill.position);
 
-            if(AtDestination(3f))
+            if(!currentDest)
+            {
+                SetGrindingTarget();
+            }
+
+            else if(AtDestination())
             {
                 StartCoroutine(GrindingCoroutine());
+            }
+
+            else
+            {
+                SetGrindingTarget();
             }
         }
     }
@@ -61,9 +103,11 @@ public class FarmerIA : MonoBehaviour
     IEnumerator GrindingCoroutine()
     {
         grinding = false;
+        millDeposits[currentDest] = false;
         
         yield return new WaitForSeconds(grindingTime);
 
+        millDeposits[currentDest] = true;
         farming = true;
     }
 
@@ -71,17 +115,30 @@ public class FarmerIA : MonoBehaviour
     {   
         farming = false;
 
+        Debug.Log(navmesh.avoidancePriority + " Started Coroutine at timestamp : " + Time.time);
         yield return new WaitForSeconds(farmingTime);
+        Debug.Log(navmesh.avoidancePriority + " Finished Coroutine at timestamp : " + Time.time);
 
         grinding = true;
     }
 
-    private void SetTarget()
+    private void SetFarmingTarget()
     {
         currentDest = GetNearestPlantation();
         if(currentDest is null)
         {
-            return;
+            navmesh.ResetPath();
+        } else {
+            navmesh.SetDestination(currentDest.position);
+        }
+    }
+
+    private void SetGrindingTarget()
+    {
+        currentDest = GetNearestFreeMillDeposit();
+        if(currentDest is null)
+        {
+            navmesh.ResetPath();
         } else {
             navmesh.SetDestination(currentDest.position);
         }
@@ -89,13 +146,8 @@ public class FarmerIA : MonoBehaviour
 
     bool AtDestination()
     {
-        return AtDestination(gatheringDistance);
-    }
-
-    bool AtDestination(float range)
-    {
         float dist = Vector3.Distance(transform.position, navmesh.destination);
-        return (dist <= range);
+        return (dist <= gatheringDistance);
     }
 
     Transform GetNearestPlantation()
@@ -118,6 +170,40 @@ public class FarmerIA : MonoBehaviour
                     nearest = child;
                     mindist = dist;
                 }
+            }
+        }
+
+        return nearest;
+    }
+
+    Transform GetNearestFreeMillDeposit()
+    {
+        
+        if(millDeposits.Count <= 0)
+        {
+            Debug.Log("No deposits found");
+            return null;
+        }
+
+        List<KeyValuePair<Transform, bool>> freeDeposits = millDeposits.Where(freeDeposit => freeDeposit.Value == true).ToList();
+
+        if(freeDeposits.Count <= 0)
+        {
+            Debug.Log("No free deposit to grind");
+            return null;
+        }
+
+        Debug.Log(freeDeposits.Count);
+
+        Transform nearest = null;
+        float mindist = 1000f;
+        foreach (KeyValuePair<Transform, bool> deposit in freeDeposits)
+        {
+            float dist = Vector3.Distance(transform.position, deposit.Key.position);
+            if(dist < mindist)
+            {
+                nearest = deposit.Key;
+                mindist = dist;
             }
         }
 
