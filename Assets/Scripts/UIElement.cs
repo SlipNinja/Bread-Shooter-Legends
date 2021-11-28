@@ -10,7 +10,7 @@ public class UIElement : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     void Start()
     {
-        controller = GameObject.Find("MainCamera").GetComponent<Controller>();
+        controller = GameObject.Find("Camera").GetComponent<Controller>();
     }
 
     // Update is called once per frame

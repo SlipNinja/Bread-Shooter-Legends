@@ -12,8 +12,8 @@ public class FarmerIA : MonoBehaviour
     private static GameObject Mills;
     private float gatheringDistance = 2f;
     private float grindingDistance = 2f;
-    private float grindingTime = 4f;
-    private float farmingTime = 2f;
+    private float grindingTime = 2f;
+    private float farmingTime = 1f;
     private Growth growthScript;
     private NavMeshAgent navmesh;
     private bool farming, grinding;
@@ -23,9 +23,12 @@ public class FarmerIA : MonoBehaviour
     private Image lifeImg;
     private float currentHP;
     private float maxHP = 100f;
+    private InterfaceHandle inter;
 
     void Start()
     {
+        inter = GameObject.Find("Interface").GetComponent<InterfaceHandle>();
+
         currentHP = maxHP;
         lifebar = transform.Find("LifeBar");
         lifeImg = lifebar.Find("front").GetComponent<Image>();
@@ -128,6 +131,7 @@ public class FarmerIA : MonoBehaviour
         if (currentHP <= 0)
         {
             currentHP = 0;
+            inter.RemoveFarmer();
             Destroy(transform.gameObject);
         }
     }
@@ -139,6 +143,7 @@ public class FarmerIA : MonoBehaviour
 
         yield return new WaitForSeconds(grindingTime);
 
+        inter.AddWeat();
         millDeposits[currentDest] = true;
         farming = true;
     }

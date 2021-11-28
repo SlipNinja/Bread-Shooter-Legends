@@ -9,17 +9,25 @@ public class Controller : MonoBehaviour
 
     public Texture2D cursorTexture;
 
-    private float dragSpeed = 200f;
+    private float dragSpeed = 50f;
+    private float zoomSpeed = 2f;
     private float ClickDeltaTime = 0.2f;
     private float downClickTime = 0f;
     private float damages = 50f;
 
     private CursorMode cursorMode = CursorMode.Auto;
     private Vector2 cursorOffset;
-    private float textureSize = 1.5f;
+    private InterfaceHandle inter;
+    private Transform cameraTransform;
+    private Camera cam;
  
     void Start()
     {
+        inter = GameObject.Find("Interface").GetComponent<InterfaceHandle>();
+
+        cameraTransform = transform.Find("MainCamera");
+        cam = cameraTransform.GetComponent<Camera>();
+
         cursorOffset = new Vector2(cursorTexture.width/2, cursorTexture.height/2);
 
         ChangeCursor(false);
@@ -27,6 +35,7 @@ public class Controller : MonoBehaviour
  
     void Update()
     {
+        ZoomLevel();
 
         if (Input.GetMouseButtonDown (0))
         {
@@ -47,35 +56,61 @@ public class Controller : MonoBehaviour
 
         if(Input.GetMouseButton(0))
         {
-            float mouseX = Input.GetAxis("Mouse X") * dragSpeed * Time.deltaTime;
-            float mouseY = Input.GetAxis("Mouse Y") * dragSpeed * Time.deltaTime;
+            if(Time.time - downClickTime > ClickDeltaTime)
+            {
+                float mouseX = Input.GetAxis("Mouse X") * dragSpeed * Time.deltaTime;
+                float mouseY = Input.GetAxis("Mouse Y") * dragSpeed * Time.deltaTime;
 
-            Vector3 newPos = new Vector3(mouseX, mouseY, 0);
+                //mouseX = Mathf.Clamp(mouseX, -50, 50);
+                //mouseY = Mathf.Clamp(mouseY, -50, 50);
 
-            transform.Translate(-newPos);
+                Vector3 newPos = new Vector3(mouseX, 0, mouseY);
+
+                transform.Translate(-newPos);
+
+                float newX = Mathf.Clamp(transform.position.x, -100f, 50f);
+                float newZ = Mathf.Clamp(transform.position.z, -80f, 20f);
+
+                Vector3 clampedPos = new Vector3(newX, transform.position.y, newZ);
+
+                transform.position = clampedPos;
+            }
         }
     }
 
     private Collider RaycastAtMouse()
     {
-        Camera camera = transform.GetComponent<Camera>();
-        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
         if(Physics.Raycast(ray, out hit, 1000f))
         {
-            //Debug.Log(hit.collider.name);
+            Debug.Log(hit.collider.name);
             return hit.collider;
         }
 
         return null;
     }
 
+    private void ZoomLevel()
+    {
+        float scrollDelta = Input.mouseScrollDelta.y * zoomSpeed;
+        float newY = Mathf.Clamp(transform.position.y - scrollDelta, 30f, 100f);
+
+        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+    }
+
     private void Shoot()
     {
-        Debug.Log("SHOOT !");
+        if(inter.GetAmmosCount() <= 0)
+        {
+            // No ammo
+            return;
+        }
+
+        inter.RemoveAmmo();
+
         Collider collider = RaycastAtMouse();
-        Debug.Log(collider.name);
 
         if(collider)
         {
