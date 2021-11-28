@@ -142,4 +142,13 @@ public class EnnemyIA : MonoBehaviour
         lifeImg.fillAmount = currentHP/maxHP;
     }
 
+    public void GetShooted(float damages)
+    {
+        currentHP -= damages;
+        if(currentHP <= 0)
+        {
+            currentHP = 0;
+            Destroy(gameObject);
+        }
+    }
 }
