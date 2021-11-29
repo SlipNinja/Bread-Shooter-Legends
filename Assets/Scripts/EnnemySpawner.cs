@@ -48,7 +48,7 @@ public class EnnemySpawner : MonoBehaviour
                 waveNumber++;
             }
 
-            else if(waveNumber >= waveMax)
+            else if(waveNumber > waveMax)
             {
                 hasWon = true;
                 SceneManager.LoadScene("victoryScene");
