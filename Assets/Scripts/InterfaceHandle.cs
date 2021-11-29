@@ -18,6 +18,7 @@ public class InterfaceHandle : MonoBehaviour
     private Text ammosDisplay;
     private Text farmersDisplay;
     private Text weatDisplay;
+    public bool hasLost = false;
 
     void Start()
     {
@@ -35,6 +36,13 @@ public class InterfaceHandle : MonoBehaviour
         ammosDisplay.text = ammos.ToString();
         farmersDisplay.text = farmers.ToString();
         weatDisplay.text = weat.ToString();
+
+        if(farmers <= 0 && weat < farmerCost)
+        {
+            hasLost = true;
+            Time.timeScale = 0f;
+            //deathMenu.SetActive(true);
+        }
     }
 
     public void BuyAmmos()

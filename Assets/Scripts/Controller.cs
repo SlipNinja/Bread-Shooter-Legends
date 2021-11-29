@@ -85,7 +85,7 @@ public class Controller : MonoBehaviour
 
         if(Physics.Raycast(ray, out hit, 1000f))
         {
-            Debug.Log(hit.collider.name);
+            //Debug.Log(hit.collider.name);
             return hit.collider;
         }
 
