@@ -8,7 +8,6 @@ public class EnnemySpawner : MonoBehaviour
     public GameObject ennemyPrefab;
     
     private List<Vector3> spawns;
-    private bool sendWave = false;
     private float waveTime = 30f;
     private float nextSpawn;
     private float waveNumber = 1f;

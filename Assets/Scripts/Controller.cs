@@ -11,7 +11,7 @@ public class Controller : MonoBehaviour
 
     private float dragSpeed = 50f;
     private float zoomSpeed = 2f;
-    private float ClickDeltaTime = 0.2f;
+    private float ClickDeltaTime = 0.1f;
     private float downClickTime = 0f;
     private float damages = 50f;
 
@@ -20,6 +20,9 @@ public class Controller : MonoBehaviour
     private InterfaceHandle inter;
     private Transform cameraTransform;
     private Camera cam;
+    private bool click = false;
+    private float nextShot = 0.0f;
+    private float shotCooldown = 1.5f;
  
     void Start()
     {
@@ -44,14 +47,17 @@ public class Controller : MonoBehaviour
 
         if (Input.GetMouseButtonUp (0))
         {
+            click = false;
             if(Time.time - downClickTime <= ClickDeltaTime)
             {
-                // If not on UI then shoot
-                if(!onUI)
-                {
-                    Shoot();
-                }
-            }  
+                click = true;
+            }
+
+            if(Time.time > nextShot && !onUI && click)
+            {
+                nextShot = Time.time + shotCooldown;
+                Shoot();
+            }
         }
 
         if(Input.GetMouseButton(0))
@@ -108,6 +114,7 @@ public class Controller : MonoBehaviour
             return;
         }
 
+        inter.ShotSound();
         inter.RemoveAmmo();
 
         Collider collider = RaycastAtMouse();

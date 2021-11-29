@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class InterfaceHandle : MonoBehaviour
@@ -19,9 +20,12 @@ public class InterfaceHandle : MonoBehaviour
     private Text farmersDisplay;
     private Text weatDisplay;
     public bool hasLost = false;
+    private AudioSource shotSound;
 
     void Start()
     {
+        shotSound = GetComponent<AudioSource>();
+        
         buyFarmer = transform.Find("farmerButton").Find("CostText").GetComponent<Text>();
         buyAmmos = transform.Find("ammoButton").Find("CostText").GetComponent<Text>();
         ammosDisplay = transform.Find("ammoDisplay").Find("Text").GetComponent<Text>();
@@ -40,9 +44,14 @@ public class InterfaceHandle : MonoBehaviour
         if(farmers <= 0 && weat < farmerCost)
         {
             hasLost = true;
-            Time.timeScale = 0f;
-            //deathMenu.SetActive(true);
+            //Time.timeScale = 0f;
+            SceneManager.LoadScene("defeatScene");
         }
+    }
+
+    public void ShotSound()
+    {
+        shotSound.Play();
     }
 
     public void BuyAmmos()
