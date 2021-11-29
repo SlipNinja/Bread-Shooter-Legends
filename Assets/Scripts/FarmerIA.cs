@@ -12,7 +12,7 @@ public class FarmerIA : MonoBehaviour
     private static GameObject Mills;
     private float gatheringDistance = 2f;
     private float grindingDistance = 2f;
-    private float grindingTime = 2f;
+    private float grindingTime = 3f;
     private float farmingTime = 1f;
     private Growth growthScript;
     private NavMeshAgent navmesh;

@@ -12,7 +12,7 @@ public class Growth : MonoBehaviour
     private float minGapX, minGapZ;
     private GameObject spawns;
     private Dictionary<GameObject, GameObject> spawnPoints; // <spawnPoint, weat>
-    private float spawnRate = 1f;
+    private float spawnRate = 2f;
     private float nextSpawn = 0.0f;
 
     void Start()

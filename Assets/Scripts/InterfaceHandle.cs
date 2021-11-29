@@ -8,24 +8,33 @@ public class InterfaceHandle : MonoBehaviour
 {
 
     private int ammos = 6;
-    private int weat = 10;
+    private int weat = 8;
     private int farmers = 0;
+    private int ennemies = 0;
+    private int wave = 0;
+    private int waveMax = 0;
 
-    public int farmerCost = 5;
-    public int ammoCost = 10;
+    public int farmerCost = 4;
+    public int ammoCost = 8;
+    public bool hasLost = false;
+    public AudioSource shotSound;
+    public AudioSource blankShotSound;
 
     private Text buyFarmer;
     private Text buyAmmos;
+    private Text waveCount;
+    private Text ennemiesCount;
     private Text ammosDisplay;
     private Text farmersDisplay;
     private Text weatDisplay;
-    public bool hasLost = false;
-    private AudioSource shotSound;
+    private Transform ennemiesDisplay;
 
     void Start()
     {
-        shotSound = GetComponent<AudioSource>();
-        
+        //shotSound = GetComponent<AudioSource>();        
+        ennemiesDisplay = transform.Find("ennemiesDisplay");
+        waveCount = ennemiesDisplay.Find("waveText").GetComponent<Text>();
+        ennemiesCount = ennemiesDisplay.Find("ennemiesText").GetComponent<Text>();
         buyFarmer = transform.Find("farmerButton").Find("CostText").GetComponent<Text>();
         buyAmmos = transform.Find("ammoButton").Find("CostText").GetComponent<Text>();
         ammosDisplay = transform.Find("ammoDisplay").Find("Text").GetComponent<Text>();
@@ -35,11 +44,22 @@ public class InterfaceHandle : MonoBehaviour
 
     void Update()
     {
+        farmerCost = 4 + (int)(farmers/4);
         buyFarmer.text = "Cost : " + farmerCost.ToString();
         buyAmmos.text = "Cost : " + ammoCost.ToString();
         ammosDisplay.text = ammos.ToString();
         farmersDisplay.text = farmers.ToString();
         weatDisplay.text = weat.ToString();
+
+        ennemiesCount.text = ennemies.ToString() + " ennemies left";
+        waveCount.text = "WAVE " + wave.ToString() + " / " + waveMax.ToString();
+
+        if(ennemies > 0)
+        {
+            ennemiesDisplay.gameObject.SetActive(true);
+        } else {
+            ennemiesDisplay.gameObject.SetActive(false);
+        }
 
         if(farmers <= 0 && weat < farmerCost)
         {
@@ -52,6 +72,16 @@ public class InterfaceHandle : MonoBehaviour
     public void ShotSound()
     {
         shotSound.Play();
+    }
+
+    public void BlankShotSound()
+    {
+        blankShotSound.Play();
+    }
+
+    public void SetMaxWave(int max)
+    {
+        waveMax = max;
     }
 
     public void BuyAmmos()
@@ -110,5 +140,20 @@ public class InterfaceHandle : MonoBehaviour
         {
             weat = 0;
         }
+    }
+
+    public void AddEnnemy()
+    {
+        ennemies++;
+    }
+
+    public void RemoveEnnemy()
+    {
+        ennemies--;
+    }
+
+    public void IncrementWave()
+    {
+        wave ++;
     }
 }

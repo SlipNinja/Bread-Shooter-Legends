@@ -10,8 +10,8 @@ public class Controller : MonoBehaviour
     public Texture2D cursorTexture;
 
     private float dragSpeed = 50f;
-    private float zoomSpeed = 2f;
-    private float ClickDeltaTime = 0.1f;
+    private float zoomSpeed = 3f;
+    private float ClickDeltaTime = 0.15f;
     private float downClickTime = 0f;
     private float damages = 50f;
 
@@ -22,7 +22,7 @@ public class Controller : MonoBehaviour
     private Camera cam;
     private bool click = false;
     private float nextShot = 0.0f;
-    private float shotCooldown = 1.5f;
+    private float shotCooldown = 0.5f;
  
     void Start()
     {
@@ -101,7 +101,7 @@ public class Controller : MonoBehaviour
     private void ZoomLevel()
     {
         float scrollDelta = Input.mouseScrollDelta.y * zoomSpeed;
-        float newY = Mathf.Clamp(transform.position.y - scrollDelta, 30f, 100f);
+        float newY = Mathf.Clamp(transform.position.y - scrollDelta, 30f, 120f);
 
         transform.position = new Vector3(transform.position.x, newY, transform.position.z);
     }
@@ -111,6 +111,7 @@ public class Controller : MonoBehaviour
         if(inter.GetAmmosCount() <= 0)
         {
             // No ammo
+            inter.BlankShotSound();
             return;
         }
 

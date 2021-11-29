@@ -15,16 +15,18 @@ public class EnnemyIA : MonoBehaviour
     private Transform lifebar;
     private Image lifeImg;
     private float currentHP;
-    private float maxHP = 100f;
+    private float maxHP = 150f;
     private Transform target;
     private bool canHit = true;
-    private float attackDamage = 20f;
+    private float attackDamage = 40f;
     private float attackSpeed = 2f;
     private float nextHit = 0.0f;
-
+    InterfaceHandle inter;
 
     void Start()
     {
+        inter = GameObject.Find("Interface").GetComponent<InterfaceHandle>();
+        inter.AddEnnemy();
         navmesh = GetComponent<NavMeshAgent>();
         Farmers = GameObject.FindWithTag("farmers").transform;
         Mills = GameObject.FindWithTag("mills").transform;
@@ -148,6 +150,7 @@ public class EnnemyIA : MonoBehaviour
         if(currentHP <= 0)
         {
             currentHP = 0;
+            inter.RemoveEnnemy();
             Destroy(gameObject);
         }
     }

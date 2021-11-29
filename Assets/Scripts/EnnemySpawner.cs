@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Linq;
 
 public class EnnemySpawner : MonoBehaviour
@@ -19,6 +20,7 @@ public class EnnemySpawner : MonoBehaviour
     void Start()
     {
         inter = GameObject.Find("Interface").GetComponent<InterfaceHandle>();
+        inter.SetMaxWave((int)waveMax);
         spawns = new List<Vector3>();
         foreach (Transform spawn in transform.Find("Spawns"))
         {
@@ -36,19 +38,23 @@ public class EnnemySpawner : MonoBehaviour
 
         ennemiesAlive = EnnemiesAlive();
 
-        if (Time.time > nextSpawn && waveNumber < waveMax)
+        if(ennemiesAlive <= 0)
         {
+            if (Time.time > nextSpawn && waveNumber < waveMax)
+            {
+                SpawnEnnemies((int)waveNumber);
+
+                inter.IncrementWave();
+                waveNumber++;
+            }
+
+            else if(waveNumber >= waveMax)
+            {
+                hasWon = true;
+                SceneManager.LoadScene("victoryScene");
+            }
+        } else {
             nextSpawn = Time.time + waveTime;
-            SpawnEnnemies((int)waveNumber);
-
-            waveNumber++;
-        }
-
-        else if(waveNumber >= waveMax && ennemiesAlive <= 0)
-        {
-            hasWon = true;
-            Time.timeScale = 0f;
-            //winMenu.SetActive(true);
         }
     }
 
@@ -89,7 +95,9 @@ public class EnnemySpawner : MonoBehaviour
     {
         foreach (int index in GetRandomSpawns(number))
         {
-            Vector3 spawnPos = spawns.ElementAt(index) + new Vector3(0, 2f, 0);
+            float posx = Random.Range(-30, 30);
+            float posz = Random.Range(-30, 30);
+            Vector3 spawnPos = spawns.ElementAt(index) + new Vector3(posx, 2f, posz);
             GameObject newEnnemy = Instantiate(ennemyPrefab, spawnPos, Quaternion.identity);
 
             newEnnemy.transform.SetParent(transform);
