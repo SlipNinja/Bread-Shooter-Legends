@@ -40,7 +40,7 @@ public class EnnemySpawner : MonoBehaviour
 
         if(ennemiesAlive <= 0)
         {
-            if (Time.time > nextSpawn && waveNumber < waveMax)
+            if (Time.time > nextSpawn && waveNumber <= waveMax)
             {
                 SpawnEnnemies((int)waveNumber);
 
