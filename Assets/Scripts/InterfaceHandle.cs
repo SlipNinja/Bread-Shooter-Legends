@@ -47,6 +47,7 @@ public class InterfaceHandle : MonoBehaviour
         farmerCost = 4 + (int)(farmers/4);
         buyFarmer.text = "Cost : " + farmerCost.ToString();
         buyAmmos.text = "Cost : " + ammoCost.ToString();
+
         ammosDisplay.text = ammos.ToString();
         farmersDisplay.text = farmers.ToString();
         weatDisplay.text = weat.ToString();

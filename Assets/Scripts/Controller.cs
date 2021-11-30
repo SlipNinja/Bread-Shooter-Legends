@@ -74,7 +74,7 @@ public class Controller : MonoBehaviour
 
                 transform.Translate(-newPos);
 
-                float newX = Mathf.Clamp(transform.position.x, -100f, 50f);
+                float newX = Mathf.Clamp(transform.position.x, -160f, 50f);
                 float newZ = Mathf.Clamp(transform.position.z, -80f, 20f);
 
                 Vector3 clampedPos = new Vector3(newX, transform.position.y, newZ);
