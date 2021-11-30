@@ -10,14 +10,13 @@ public class EnnemyIA : MonoBehaviour
     private Transform Mills;
     private Transform Farmers;
     private NavMeshAgent navmesh;
-    private float range = 20f;
+    private float range = 30f;
     private float rangeAttack = 3f;
     private Transform lifebar;
     private Image lifeImg;
     private float currentHP;
     private float maxHP = 150f;
     private Transform target;
-    private bool canHit = true;
     private float attackDamage = 40f;
     private float attackSpeed = 2f;
     private float nextHit = 0.0f;
@@ -58,19 +57,11 @@ public class EnnemyIA : MonoBehaviour
             }
         }
 
-        if(!canHit)
-        {
-            if (Time.time > nextHit )
-            {
-                nextHit = Time.time + 1/attackSpeed;
-                canHit = true;
-            }
-        }
-
-        else if(CloseToTarget())
+        if(CloseToTarget() && Time.time > nextHit)
         {
             HitTarget();
-            canHit = false;
+            nextHit = Time.time + 1/attackSpeed;
+
         }
     }
 
@@ -144,7 +135,7 @@ public class EnnemyIA : MonoBehaviour
         lifeImg.fillAmount = currentHP/maxHP;
     }
 
-    public void GetShooted(float damages)
+    public void GetHit(float damages)
     {
         currentHP -= damages;
         if(currentHP <= 0)

@@ -12,6 +12,10 @@ public class FarmerIA : MonoBehaviour
     private static GameObject Mills;
     private float gatheringDistance = 2f;
     private float grindingDistance = 2f;
+    private float attackingDistance = 3f;
+    private float attackingRange = 10f;
+    private float attackDamage = 10f;
+    private float attackSpeed = 2f;
     private float grindingTime = 3f;
     private float farmingTime = 1f;
     private Growth growthScript;
@@ -24,10 +28,14 @@ public class FarmerIA : MonoBehaviour
     private float currentHP;
     private float maxHP = 100f;
     private InterfaceHandle inter;
+    private Transform ennemies;
+    private List<Transform> ennemiesList;
+    private float nextHit = 0.0f;
 
     void Start()
     {
         inter = GameObject.Find("Interface").GetComponent<InterfaceHandle>();
+        ennemies = GameObject.Find("Ennemies").transform;
 
         currentHP = maxHP;
         lifebar = transform.Find("LifeBar");
@@ -73,6 +81,22 @@ public class FarmerIA : MonoBehaviour
     void Update()
     {
         UpdateLifebar();
+
+        ennemiesList = EnnemiesInRange();
+        if(ennemiesList.Count > 0)
+        {
+            SetAttackingTarget();
+
+            float distanceToEnnemy = Vector3.Distance(transform.position, currentDest.position);
+
+            if(distanceToEnnemy <= attackingDistance && Time.time > nextHit)
+            {
+                currentDest.GetComponent<EnnemyIA>().GetHit(attackDamage);
+                nextHit = Time.time + 1/attackSpeed;
+            }
+
+            return;
+        }  
 
         if(farming)
         {
@@ -125,6 +149,43 @@ public class FarmerIA : MonoBehaviour
         lifeImg.fillAmount = currentHP/maxHP;
     }
 
+    private List<Transform> EnnemiesInRange()
+    {
+        List<Transform> ennemiesInRange = new List<Transform>();
+        foreach (Transform child in ennemies)
+        {
+            if(child.name.Contains("Ennemy"))
+            {
+                float dist = Vector3.Distance(transform.position, child.position);
+
+                if(dist <= attackingRange)
+                {
+                    ennemiesInRange.Add(child);
+                }
+            }
+        }
+
+        return ennemiesInRange;
+    }
+
+    private Transform Closest(List<Transform> transforms)
+    {
+        float mindist = 1000f;
+        Transform closest = null;
+
+        foreach (Transform t in transforms)
+        {
+            float dist = Vector3.Distance(transform.position, t.position);
+            if(dist <= mindist)
+            {
+                mindist = dist;
+                closest = t;
+            }
+        }
+
+        return closest;
+    }
+
     public void GetHit(float damages)
     {
         currentHP -= damages;
@@ -166,6 +227,14 @@ public class FarmerIA : MonoBehaviour
         } else {
             navmesh.SetDestination(currentDest.position);
         }
+    }
+
+    private void SetAttackingTarget()
+    {
+        currentDest = Closest(ennemiesList);
+        Vector3 targetPos = new Vector3(currentDest.position.x, 0f, currentDest.position.z);
+        
+        navmesh.SetDestination(targetPos);
     }
 
     private void SetGrindingTarget()

@@ -124,7 +124,7 @@ public class Controller : MonoBehaviour
         {
             if(collider.name.Contains("Ennemy"))
             {
-                collider.GetComponent<EnnemyIA>().GetShooted(damages);
+                collider.GetComponent<EnnemyIA>().GetHit(damages);
             }
 
             else if(collider.name.Contains("Farmer"))
